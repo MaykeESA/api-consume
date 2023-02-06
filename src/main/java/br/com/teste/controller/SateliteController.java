@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,7 +20,7 @@ import br.com.teste.model.bd.Satelite;
 import br.com.teste.model.dto.SateliteDto;
 import br.com.teste.model.request.SateliteRequest;
 import br.com.teste.repository.SateliteRepository;
-import br.com.teste.service.SateliteService;
+import br.com.teste.service.ApiConsumeService;
 
 @RestController
 public class SateliteController {
@@ -30,7 +29,7 @@ public class SateliteController {
 	private SateliteRepository satRepository;
 	
 	@Autowired
-	private SateliteService sateliteService ;
+	private ApiConsumeService apiConsumeService;
 
 	// Traz satélites do BD
 	@GetMapping("/satelites")
@@ -43,8 +42,8 @@ public class SateliteController {
 	@GetMapping("/buscar-satelite/{id}")
 	public ResponseEntity<SateliteDto> buscarById(@PathVariable int id) {
 		try {
-			SateliteRequest satelite = this.sateliteService.buscarById(id);
-			return ResponseEntity.ok(satelite.converterDto());			
+			SateliteRequest request = this.apiConsumeService.buscarSateliteById(id);
+			return ResponseEntity.ok(request.converterDto());			
 		}catch(HttpClientErrorException e) {
 			return ResponseEntity.notFound().build();
 		}
@@ -60,12 +59,4 @@ public class SateliteController {
 		return ResponseEntity.created(uri).body(satDto);
 	}
 	
-	@GetMapping("/hello-world")
-	public String hello(@RequestParam(required = false) String nome) {
-		if(nome == null) {
-			return "Hello World! :D";
-		}else {
-			return "Hello World " + nome +"! :D";
-		}
-	}
 }
